@@ -84,16 +84,7 @@ class Program
         else
         {
             Console.Clear();
-            Console.WriteLine("Hit at (" + Column + "," + Row + ").");
-            
-            while (won = false)
-            {
-                Console.WriteLine($"Hits: {hit} Misses{miss}");
-                if (won = true)
-                {
-                    hit++;
-                }
-            }
+            Console.WriteLine("Hit at (" + Column + "," + Row + ")");
             for (int i = 0; i < 7-1; i++)
             {
                 if (Board[Row, Column] == System.Convert.ToChar(Ships[i].Name[0]))
