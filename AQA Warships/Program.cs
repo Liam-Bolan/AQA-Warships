@@ -5,7 +5,10 @@
 //Version Number 1.0
 
 using System;
+using System.Data.Common;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 class Program
 {
@@ -13,54 +16,132 @@ class Program
     {
         public string Name;
         public int Size;
+        
     }
 
     const string TrainingGame = "Training.txt";
 
-    private static void GetRowColumn(ref int Row, ref int Column, ref int Points)
+    private static void GetRowColumn(ref int Row, ref int Column)
     {
-        Console.WriteLine();
-        Console.Write("Please enter column: ");
-        Column = Convert.ToInt32(Console.ReadLine());
-        Console.Write("Please enter row: ");
-        Row = Convert.ToInt32(Console.ReadLine());
-        Console.WriteLine();
-        
+        Console.WriteLine();   
+             
+        try
+        {
+            Console.Write("Please enter column: ");
+            Column = Convert.ToInt32(Console.ReadLine());
+            while(Column < 0 || Column > 9)
+            {
+                Console.WriteLine("incorrect coordinate entered! Enter again: ");
+                Column = int.Parse(Console.ReadLine());
+            } 
+        }
+        catch(Exception)
+        {
+            Console.Write("Error! enter a number: ");
+            Column = int.Parse(Console.ReadLine());
+        }
+        try
+        {
+            Console.Write("Please enter Row: ");
+            Row = Convert.ToInt32(Console.ReadLine());
+            while (Row < 0 || Row > 9)
+            {
+                Console.Write("incorrect coordinate entered! Enter again: ");
+                Row = int.Parse(Console.ReadLine());
+            }
+        }
+        catch (Exception)
+        {
+            Console.Write("Error! enter a number: ");
+            Row = int.Parse(Console.ReadLine());
+        }
+
     }
 
     private static void MakePlayerMove(ref char[,] Board, ref ShipType[] Ships)
     {
-        int Points = 0;
         int Row = 0;
         int Column = 0;
-        GetRowColumn(ref Row, ref Column, ref Points);
+        int hit = 0;
+        int miss = 0;
+        bool won = false;
+        
+        GetRowColumn(ref Row, ref Column);
+        
         if (Board[Row, Column] == 'm' || Board[Row, Column] == 'h')
         {
             Console.Clear();
             Console.WriteLine("Sorry, you have already shot at the square (" + Column + "," + Row + "). Please try again.");
-            Console.WriteLine($"Points = {Points}");
-            Points
-            
         }
         else if (Board[Row, Column] == '-')
         {
             Console.Clear();
             Console.WriteLine("Sorry, (" + Column + "," + Row + ") is a miss.");
+            miss++;
             Board[Row, Column] = 'm';
-            Console.WriteLine($"Points = {Points}");
-            Points;
-            
+                       
         }
         else
         {
             Console.Clear();
             Console.WriteLine("Hit at (" + Column + "," + Row + ").");
-            Board[Row, Column] = 'h';
-            Points++;
-            Console.WriteLine($"Points = {Points}");
             
-        }  
+            while (won = false)
+            {
+                Console.WriteLine($"Hits: {hit} Misses{miss}");
+                if (won = true)
+                {
+                    hit++;
+                }
+            }
+            for (int i = 0; i < 7-1; i++)
+            {
+                if (Board[Row, Column] == System.Convert.ToChar(Ships[i].Name[0]))
+                {
+                    Board[Row, Column] = System.Convert.ToChar(Ships[i].Name.ToLower()[0]);
+                }
+                
+            }
+            if(Board[Row, Column] == 'A')
+            {
+                Console.WriteLine("You hit an Aircraft carrier");
+                Board[Row, Column] = 'a';
+            }
+            else if (Board[Row, Column] == 'B')
+            {
+                Console.WriteLine("You hit a Battleship");
+                Board[Row, Column] = 'b';
+            }
+            else if (Board[Row, Column] == 'S')
+            {
+                Console.WriteLine("You hit a Submarine");
+                Board[Row, Column] = 's';
+            }
+            else if (Board[Row, Column] == 'D')
+            {
+                Console.WriteLine("You hit a Destroyer");
+                Board[Row, Column] = 'd';
+            }
+            else if (Board[Row, Column] == 'P')
+            {
+                Console.WriteLine("You hit a Patrol Boat");
+                Board[Row, Column] = 'p';
+            }
+            else if (Board[Row, Column] == 'F')
+            {
+                Console.WriteLine("You hit a Frigate");
+                Board[Row, Column] = 'f';
+                           
+            }
+           
+            
+            
+
+
+        }
+        
     }
+    
 
     private static void SetUpBoard(ref char[,] Board)
     {
@@ -179,7 +260,7 @@ class Program
         {
             for (int Column = 0; Column < 10; Column++)
             {
-                if (Board[Row, Column] == 'A' || Board[Row, Column] == 'B' || Board[Row, Column] == 'S' || Board[Row, Column] == 'D' || Board[Row, Column] == 'P')
+                if (Board[Row, Column] == 'A' || Board[Row, Column] == 'B' || Board[Row, Column] == 'S' || Board[Row, Column] == 'D' || Board[Row, Column] == 'P' || Board[Row, Column] == 'F')
                 {
                     return false;
                 }
@@ -191,7 +272,6 @@ class Program
     private static void PrintBoard(char[,] Board)
     {
         Console.WriteLine();
-        Console.WriteLine("The board looks like this: ");
         Console.WriteLine();
         Console.Write(" ");
         for (int Column = 0; Column < 10; Column++)
@@ -208,7 +288,7 @@ class Program
                 {
                     Console.Write(" ");
                 }
-                else if (Board[Row, Column] == 'A' || Board[Row, Column] == 'B' || Board[Row, Column] == 'S' || Board[Row, Column] == 'D' || Board[Row, Column] == 'P')
+                else if (Board[Row, Column] == 'A' || Board[Row, Column] == 'B' || Board[Row, Column] == 'S' || Board[Row, Column] == 'D' || Board[Row, Column] == 'P' ||Board[Row, Column] == 'F')
                 {
                     Console.Write(" ");
                 }
@@ -238,14 +318,20 @@ class Program
     private static int GetMainMenuChoice()
     {
         int Choice = 0;
-        Console.Write("Please enter your choice: ");
-        Choice = Convert.ToInt32(Console.ReadLine());
-        Console.WriteLine();
-        while(Choice < 1 || Choice > 3)
+        try
         {
-            Choice = 0;
-            Console.Write("Please enter your choice: ");
+            Console.Write("Please enter Choice: ");
             Choice = Convert.ToInt32(Console.ReadLine());
+            while (Choice < 0 || Choice > 3)
+            {
+                Console.Write("Please enter choice again: ");
+                Choice = int.Parse(Console.ReadLine());
+            }
+        }
+        catch (Exception)
+        {
+            Console.Write("Error! enter a number: ");
+            Choice = int.Parse(Console.ReadLine());
         }
         return Choice;
     }
@@ -253,6 +339,7 @@ class Program
     private static void PlayGame(ref char[,] Board, ref ShipType[] Ships)
     {
         bool GameWon = false;
+        int maxGos = 30;
         while (GameWon == false)
         {
             PrintBoard(Board);
@@ -263,26 +350,45 @@ class Program
                 Console.WriteLine("All ships sunk!");
                 Console.WriteLine();
             }
+            else
+            {
+                maxGos -= 1;
+                Console.WriteLine($"You have {maxGos} moves left! ");
+                if (maxGos == 0)
+                {
+                    Console.WriteLine("Oh no you have ran out of moves!");
+                    return;
+                }
+            }
         }
     }
 
     private static void SetUpShips(ref ShipType[] Ships)
     {
+        
         Ships[0].Name = "Aircraft Carrier";
         Ships[0].Size = 5;
+        
         Ships[1].Name = "Battleship";
         Ships[1].Size = 4;
+        
         Ships[2].Name = "Submarine";
         Ships[2].Size = 3;
+        
         Ships[3].Name = "Destroyer";
         Ships[3].Size = 3;
+        
         Ships[4].Name = "Patrol Boat";
         Ships[4].Size = 2;
+        
+        Ships[5].Name = "Frigate";
+        Ships[5].Size = 2;
+        
     }
 
     static void Main(string[] args)
     {
-        ShipType[] Ships = new ShipType[5];
+        ShipType[] Ships = new ShipType[6];
         char[,] Board = new char[10, 10];
         int MenuOption = 0;
         while (MenuOption != 3)
